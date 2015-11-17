@@ -1,34 +1,42 @@
 #pragma once
+
 #include "MyEntityClass.h"
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
 class EntityManager
 {
-	int entityCount = 0; //number of Entites in the list
-	std::vector<MyEntityClass*> m_lEntities; //list of Entities
-	static EntityManager instance;
-	static EntityManager* m_pInstance;
-	EntityManager* pEntityMngr;
+    static EntityManager instance;
 
-	EntityManager();
-	~EntityManager();
+    std::vector<std::shared_ptr<MyEntityClass>> _entities;
+    std::unordered_map<String, size_t> _entityCache;
+    MeshManagerSingleton* _meshManager;
+
+    EntityManager();
+    ~EntityManager();
+
+    // Hide all instance methods
+    EntityManager( const EntityManager& ) = delete;
+    EntityManager( EntityManager&& ) = delete;
+    EntityManager& operator=( const EntityManager& ) = delete;
+    EntityManager& operator=( EntityManager&& ) = delete;
+
 public:
-	static EntityManager* getInstance();
-	static void ReleaseInstance(void);
-	//void AddEntity(std::vector<vector3> list, String a_sName);
+    /// <summary>
+    /// Gets the manager instance.
+    /// </summary>
+    static EntityManager* GetInstance();
 
-private:
+    /// <summary>
+    /// Adds an entity to this manager.
+    /// </summary>
+    /// <param name="name">The entity's name.</param>
+    MyEntityClass* AddEntity( String name );
 
-	EntityManager(void);
-
-	EntityManager(EntityManager const& other);
-
-	EntityManager& operator=(EntityManager const& other);
-
-	~EntityManager(void);
-
-	void Release(void);
-
-	void Init(void);
-
-
+    /// <summary>
+    /// Updates all of the entities.
+    /// </summary>
+    void UpdateEntites();
 };
-

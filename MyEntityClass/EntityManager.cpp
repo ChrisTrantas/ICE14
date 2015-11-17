@@ -1,51 +1,41 @@
 #include "EntityManager.h"
 
 EntityManager EntityManager::instance;
-EntityManager* EntityManager::m_pInstance = nullptr;
+
+// Create a new entity manager
 EntityManager::EntityManager()
+    : _meshManager( MeshManagerSingleton::GetInstance() )
 {
 }
 
-
+// Destroy this entity manager
 EntityManager::~EntityManager()
 {
+    // No need to cleanup anything
 }
 
-void EntityManager::Init(void)
+// Get the entity manager instance
+EntityManager* EntityManager::GetInstance()
 {
-	entityCount = 0;
-	pEntityMngr = EntityManager::getInstance();
+    return &instance;
 }
 
-void EntityManager::Release(void)
+// Add an entity to the manager
+MyEntityClass* EntityManager::AddEntity( String name )
 {
-	for (int entityCount = 0; entityCount < m_lEntities.size(); entityCount++)
-	{
-		if (m_lEntities[entityCount] != nullptr)
-		{
-			delete m_lEntities[entityCount];
-			m_lEntities[entityCount] = nullptr;
-		}
-	}
-	m_lEntities.clear();
+    auto entity = std::make_shared<MyEntityClass>( name );
+
+    _entities.push_back( entity );
+    _entityCache[ name ] = _entities.size() - 1;
+
+    return entity.get();
 }
 
-EntityManager* EntityManager::getInstance()
+// Update all of the entities
+void EntityManager::UpdateEntites()
 {
-	return &instance;
+    for ( auto& entity : _entities )
+    {
+        entity->Update();
+    }
 }
-
-void EntityManager::ReleaseInstance()
-{
-	if (m_pInstance != nullptr)
-	{
-		delete m_pInstance;
-		m_pInstance = nullptr;
-	}
-}
-
-//The big 3
-EntityManager::EntityManager() { Init(); }
-EntityManager::EntityManager(EntityManager const& other) { }
-EntityManager& EntityManager::operator=(EntityManager const& other) { return *this; }
-EntityManager::~EntityManager() { Release(); };
